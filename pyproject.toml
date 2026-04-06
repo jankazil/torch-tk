@@ -4,14 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "torch-tk"
-version = "0.0.0"
-description = "Short description"
+version = "0.0.1"
+description = "Provides PyTorch model and optimizer classes, and utilities and extensions for training, checkpoint management, and diagnostics."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 authors = [{ name = "Jan Kazil" }]
-dependencies = []
+dependencies = [
+  "torch",
+  "numpy",
+  "xarray",
+  "matplotlib",
+  "scipy",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -22,10 +28,25 @@ dev = [
   "pre-commit>=3.7",
 ]
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.ruff]
 line-length = 128
 target-version = "py312"
-extend-exclude = ["dist", "build"]
+extend-exclude = [
+    "__init__.py",
+    "dist",
+    "build",
+    "data",
+    "demos",
+    "docs",
+    "experiments",
+    "notebooks",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

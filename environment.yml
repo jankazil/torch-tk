@@ -5,5 +5,10 @@ dependencies:
   - python=3.12
   - pip
   - mamba
+  - torch
+  - numpy
+  - xarray
+  - matplotlib
+  - scipy
   - pip:
       - git+https://github.com/jankazil/torch-tk
