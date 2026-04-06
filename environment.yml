@@ -1,0 +1,9 @@
+name: torch_tk
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - mamba
+  - pip:
+      - git+https://github.com/jankazil/torch-tk
