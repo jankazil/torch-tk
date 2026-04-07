@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "torch-tk"
-version = "0.0.2"
-description = "Provides PyTorch model and optimizer classes, and utilities and extensions for training, checkpoint management, and diagnostics."
+version = "0.0.3"
+description = "Streamlines training, checkpoint management, and diagnostics of PyTorch models."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "BSD-3-Clause"
