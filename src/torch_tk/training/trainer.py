@@ -336,9 +336,8 @@ class Trainer:
             plot_dir = plot_file.parent
             os.makedirs(plot_dir, exist_ok=True)
             fig.savefig(plot_file, bbox_inches='tight', pad_inches=0.25)
-
-        if verbose:
-            print('Created plot', plot_file)
+            if verbose:
+                print('Created plot', plot_file)
 
         if show_plot:
             plt.show()
@@ -351,6 +350,7 @@ class Trainer:
         self,
         plot_file=None,
         title=None,
+        font_factor=1.5,
         figsize=(9, 6),
         xlim=None,
         ylim=None,
@@ -416,9 +416,8 @@ class Trainer:
             plot_dir = plot_file.parent
             os.makedirs(plot_dir, exist_ok=True)
             fig.savefig(plot_file, bbox_inches='tight', pad_inches=0.25)
-
-        if verbose:
-            print('Created plot', plot_file)
+            if verbose:
+                print('Created plot', plot_file)
 
         if show_plot:
             plt.show()
