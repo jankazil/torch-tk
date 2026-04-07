@@ -181,11 +181,26 @@ class Diagnostics:
 
         result = Diagnostics.__new__(Diagnostics)
 
-        assert self.model == other.model
-        assert self.optimizer == other.optimizer
-        assert self.learning_rate == other.learning_rate
-        assert self.batch_size == other.batch_size
-        assert self.description == other.description
+        assert self.model == other.model, (
+            f"Cannot add Diagnostics objects with different models: "
+            f"{self.model!r} != {other.model!r}"
+        )
+        assert self.optimizer == other.optimizer, (
+            f"Cannot add Diagnostics objects with different optimizers: "
+            f"{self.optimizer!r} != {other.optimizer!r}"
+        )
+        assert self.learning_rate == other.learning_rate, (
+            f"Cannot add Diagnostics objects with different learning rates: "
+            f"{self.learning_rate!r} != {other.learning_rate!r}"
+        )
+        assert self.batch_size == other.batch_size, (
+            f"Cannot add Diagnostics objects with different batch sizes: "
+            f"{self.batch_size!r} != {other.batch_size!r}"
+        )
+        assert self.description == other.description, (
+            f"Cannot add Diagnostics objects with different descriptions: "
+            f"{self.description!r} != {other.description!r}"
+        )
 
         if self.per_sample_loss is None:
             result.model = other.model
