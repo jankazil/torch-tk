@@ -137,8 +137,8 @@ def plot_diagnostics(
         os.makedirs(plot_dir, exist_ok=True)
         fig.savefig(plot_file, bbox_inches='tight')
 
-    if verbose:
-        print('Created plot', plot_file)
+        if verbose:
+            print('Created plot', plot_file)
 
     if show_plot:
         plt.show()
