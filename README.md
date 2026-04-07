@@ -1,6 +1,18 @@
-# Torch Toolkit
+# Torch ToolKit (torch-tk)
 
-**torch-tk** provides PyTorch model and optimizer classes, and utilities and extensions for training, checkpoint management, and diagnostics.
+**torch-tk** streamlines training, checkpoint management, and diagnostics of PyTorch models.
+
+## Overview
+
+The main idea behind **torch-tk** is that it adds a small amount of structure around ordinary torch models and optimizers so that they become easier to save, restore, reconstruct, and train. In particular, **torch-tk** provides a model base class, a checkpoint manager, a trainer, and diagnostics utilities.
+
+**torch-tk** models can describe themselves. A model derived from `torch_tk.models.Model` provides the information needed to save its state and recreate the same model instance later. In practice, this means the model can expose its trainable parameters, return the constructor arguments needed to rebuild it, and load a saved state back into a fresh instance.
+
+A second useful feature is the `CheckPointManager`. Rather than saving only raw parameter tensors, it saves enough information to reconstruct both the model and the optimizer in the state that created the checkpoint. This makes it easier to stop and resume training without manually rebuilding all objects.
+
+**torch-tk** also includes a `Trainer` class for running epoch-based training. It supports training either from a `DataLoader` or directly from tensors, and it records simple diagnostics such as training loss and epoch wallclock time.
+
+In addition, **torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to netCDF for later analysis.
 
 ## Classes
 
