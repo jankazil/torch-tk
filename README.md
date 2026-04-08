@@ -15,7 +15,7 @@ A second useful feature is the `CheckPointManager`. Rather than saving only raw 
 In addition, **torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to netCDF for later analysis.
 
 ## Workflow
-The workflow is shown in the [torch-tk HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HoTwo.ipynb) Jupyter notebook. 
+The workflow is shown in the [torch-tk HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. 
 
 ## Classes
 
