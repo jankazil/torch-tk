@@ -4,15 +4,15 @@
 
 ## Overview
 
-The main idea behind **torch-tk** is that it adds a small amount of structure around ordinary torch models and optimizers so that they become easier to save, restore, reconstruct, and train. In particular, **torch-tk** provides a model base class, a checkpoint manager, a trainer, and diagnostics utilities.
+The idea behind **torch-tk** is to add a small amount of structure around torch models and optimizers so that they become easier to save, restore, reconstruct, and train. For this, **torch-tk** provides a model base class, optimizers, a checkpoint manager, a trainer, and diagnostics utilities.
 
-**torch-tk** models can describe themselves. A model derived from `torch_tk.models.Model` provides the information needed to save its state and recreate the same model instance later. In practice, this means the model can expose its trainable parameters, return the constructor arguments needed to rebuild it, and load a saved state back into a fresh instance.
+**torch-tk** models and optimizers are self-describing: A model derived from `torch_tk.models.Model` and the optimizers in `torch_tk.optimizers` provides all information needed to save their state and recreate the same model and optimizer instances later. In practice, this means a model and optimizer provide the constructor arguments and state parameters needed to rebuild them, save them to file, allowing to load them back into a fresh instances.
 
-A second useful feature is the `CheckPointManager`. Rather than saving only raw parameter tensors, it saves enough information to reconstruct both the model and the optimizer in the state that created the checkpoint. This makes it easier to stop and resume training without manually rebuilding all objects.
+**torch-tk** provides a `CheckPointManager`. The `CheckPointManager` manages saving, loading, and reconstruing both the model and the optimizer in the state that created the checkpoint. All that is required is that the class paths are available to import the original model and optimizer classes.
 
-**torch-tk** also includes a `Trainer` class for running epoch-based training. It supports training either from a `DataLoader` or directly from tensors, and it records simple diagnostics such as training loss and epoch wallclock time.
+**torch-tk** provides a `Trainer` class for running epoch-based training. It supports training either from a `DataLoader` or directly from tensors, and records basic diagnostics such as training loss and epoch wallclock time.
 
-In addition, **torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to netCDF for later analysis.
+**torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to and restored from netCDF files for later analysis.
 
 ## Workflow
 The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. 
