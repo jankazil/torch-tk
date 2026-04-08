@@ -15,7 +15,7 @@ A second useful feature is the `CheckPointManager`. Rather than saving only raw 
 In addition, **torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to netCDF for later analysis.
 
 ## Workflow
-The workflow is shown in the [torch-tk HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. 
+The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. 
 
 ## Classes
 
@@ -58,20 +58,16 @@ mamba install -c jan.kazil -c conda-forge torch-tk
 
 #### `torch_tk.models.model`
 
-Provides the abstract `Model` base class for models that can describe, save, restore, and reconstruct themselves.
+Provides the abstract `Model` base class for models that can describe, save, restore, and reconstruct themselves. The `Model` class inherits from `torch.nn.Module`, and thus provides the standard PyTorch `Module` interface.
 
-- `Model.forward(xb)`: Abstract forward pass.
-- `Model.named_parameters()`: Abstract iterator over `(name, parameter)` pairs.
-- `Model.constructor_dict()`: Abstract description of constructor arguments needed for reconstruction.
-- `Model.train(mode=True)` / `Model.eval()`: Training-mode control.
-- `Model.parameters()`: Return trainable parameters as a list.
-- `Model.state_dict(keep_vars=False)`: Return the current model state.
-- `Model.load_state_dict(state_dict, strict=True)`: Load parameters from a state dictionary.
+The `Model` class defines and provides the following methods:
+
+- `Model.forward(xb)`: Abstract method that computes the forward pass.
+- `Model.constructor_dict()`: Abstract method that returns the constructor arguments needed to reconstruct the model.
 - `Model.save_state_dict_to_file(path)`: Save only the state dictionary.
 - `Model.save_to_file(path)`: Save constructor arguments and state dictionary needed to recreate the model.
 - `Model.load_from_file(path, device=None)`: Recreate a model from a saved file.
 - `Model.clone(constructor_dict, state_dict, device=None)`: Reconstruct a model from constructor arguments and state.
-- `Model.to(device)`: Move named parameters to a device.
 
 #### `torch_tk.optimizers.sgd`
 
