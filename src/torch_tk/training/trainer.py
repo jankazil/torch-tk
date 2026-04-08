@@ -369,6 +369,8 @@ class Trainer:
             Output path for saving the figure. If omitted, the plot is not saved.
         title : str, optional
             Figure title.
+        font_factor : float, default=1.5
+            Multiplicative factor applied to all font sizes in the figure.
         figsize : tuple, default=(9, 6)
             Figure size passed to Matplotlib.
         xlim : tuple, optional
@@ -407,9 +409,9 @@ class Trainer:
         ax[0, 0].set_xlabel(xlabel)
         ax[0, 0].set_ylabel(ylabel)
 
-        # Increase all font sizes
+        # Increase all font sizes by a given factor
         for text in fig.findobj(match=lambda artist: hasattr(artist, 'get_fontsize')):
-            text.set_fontsize(text.get_fontsize() * 1.666)
+            text.set_fontsize(text.get_fontsize() * font_factor)
 
         if plot_file:
             plot_file = Path(plot_file)
