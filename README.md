@@ -6,7 +6,7 @@
 
 The idea behind **torch-tk** is to add a small amount of structure around torch models and optimizers so that they become easier to save, restore, reconstruct, and train. For this, **torch-tk** provides a model base class, optimizers, a checkpoint manager, a trainer, and diagnostics utilities.
 
-**torch-tk** models and optimizers are self-describing: A model derived from `torch_tk.models.Model` and the optimizers in `torch_tk.optimizers` provides all information needed to save their state and recreate the same model and optimizer instances later. In practice, this means a model and optimizer provide the constructor arguments and state parameters needed to rebuild them, save them to file, allowing to load them back into a fresh instances.
+**torch-tk** models and optimizers are self-describing: A model derived from `torch_tk.models.Model` and the optimizers in `torch_tk.optimizers` provide all information needed to save their state and recreate the same model and optimizer instances later. In practice, this means a model and optimizer can save to file the constructor arguments and state parameters needed to rebuild them, allowing to load them back into a fresh instances.
 
 **torch-tk** provides a `CheckPointManager`. The `CheckPointManager` manages saving, loading, and reconstruing both the model and the optimizer in the state that created the checkpoint. All that is required is that the class paths are available to import the original model and optimizer classes.
 
