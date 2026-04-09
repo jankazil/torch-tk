@@ -4,7 +4,7 @@
 
 ## Overview
 
-The idea behind **torch-tk** is to add a small amount of structure around PyTorch models and optimizers so that they become easier to save, reconstruct, and train.
+**torch-tk** adds a small amount of structure around PyTorch models and optimizers to simplify training and automate saving and restoring checkpoints.
 
 **torch-tk** provides a model base class, optimizers, a checkpoint manager, a trainer, and diagnostics utilities. The model class inherits from `torch.nn.Module`, and the **torch-tk** optimizers are wrappers around `torch.optim` optimizers such as `torch.optim.SGD` and `torch.optim.Adam`. The **torch-tk** model and optimizer classes thus preserve functionality and interface of PyTorch modules and optimizers.
 
@@ -75,14 +75,14 @@ The `Model` class defines and provides the following methods:
 
 #### `torch_tk.optimizers.sgd`
 
-Provides a reconstruction-capable wrapper around `torch.optim.SGD`.
+Wrapper around `torch.optim.SGD` to make it self-describing and automatically reconstructible.
 
 - `SGD(...)`: Subclass of `torch.optim.SGD` that stores its constructor arguments on the instance.
 - `SGD.constructor_dict()`: Return the stored optimizer constructor settings excluding `params`.
 
 #### `torch_tk.optimizers.adam`
 
-Provides a reconstruction-capable wrapper around `torch.optim.Adam`.
+Wrapper around `torch.optim.Adam` to make it self-describing and automatically reconstructible.
 
 - `Adam(...)`: Subclass of `torch.optim.Adam` that stores its constructor arguments on the instance.
 - `Adam.constructor_dict()`: Return the stored optimizer constructor settings excluding `params`.
