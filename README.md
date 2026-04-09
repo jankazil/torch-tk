@@ -4,7 +4,11 @@
 
 ## Overview
 
-The idea behind **torch-tk** is to add a small amount of structure around torch models and optimizers so that they become easier to save, restore, reconstruct, and train. For this, **torch-tk** provides a model base class, optimizers, a checkpoint manager, a trainer, and diagnostics utilities.
+The idea behind **torch-tk** is to add a small amount of structure around PyTorch models and optimizers so that they become easier to save, reconstruct, and train.
+
+**torch-tk** provides a model base class, optimizers, a checkpoint manager, a trainer, and diagnostics utilities. The model class inherits from `torch.nn.Module`, and the **torch-tk** optimizers are wrappers around `torch.optim` optimizers such as `torch.optim.SGD` and `torch.optim.Adam`. The **torch-tk** model and optimizer classes thus preserve functionality and interface of PyTorch modules and optimizers.
+
+## Key features
 
 **torch-tk** models and optimizers are self-describing: A model derived from `torch_tk.models.Model` and the optimizers in `torch_tk.optimizers` provide all information needed to save their state and recreate the same model and optimizer instances later. In practice, this means a model and optimizer can save to file the constructor arguments and state parameters needed to rebuild them, allowing to load them back into fresh instances.
 
