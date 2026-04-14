@@ -4,13 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "torch-tk"
-version = "1.0.5"
+version = "1.0.6"
 description = "Streamlines training, checkpoint management, and diagnostics of PyTorch models."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
-authors = [{ name = "Jan Kazil" }]
+authors = [
+    { name = "Jan Kazil", email = "jan.kazil.dev@gmail.com" }
+]
 dependencies = [
   "torch",
   "numpy",
@@ -18,9 +20,27 @@ dependencies = [
   "matplotlib",
   "scipy",
 ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["pytorch", "training", "checkpointing", "diagnostics", "deep-learning"]
+
+[project.urls]
+Homepage = "https://github.com/jankazil/torch-tk"
+Repository = "https://github.com/jankazil/torch-tk"
+Issues = "https://github.com/jankazil/torch-tk/issues"
 
 [project.optional-dependencies]
 dev = [
+  "build>=1.2",
+  "twine>=5.1",
   "pytest>=8",
   "pytest-cov>=5",
   "mypy>=1.11",
