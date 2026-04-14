@@ -21,6 +21,18 @@
 ## Workflow
 The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. 
 
+## Installation
+
+### pip
+```bash
+pip install torch-tk
+```
+
+### conda / mamba
+```bash
+mamba install -c jan.kazil -c conda-forge torch-tk
+```
+
 ## Classes
 
 - `Model`
@@ -49,12 +61,6 @@ The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/to
   - Computes, stores, and plots per-sample loss and per-sample loss probability distribution
   - Saves and restores diagnostics in netCDF file format
   - Identifies worst-loss samples
-
-## Installation
-
-```bash
-mamba install -c jan.kazil -c conda-forge torch-tk
-```
 
 ## Public API
 
