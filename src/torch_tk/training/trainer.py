@@ -176,7 +176,7 @@ class Trainer:
         return
 
     def train_with_data(
-        self, x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=False, verbose=True
+        self, x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=True, verbose=True
     ):
         '''
         Train the model for a given number of epochs using input and target tensors.
@@ -185,8 +185,8 @@ class Trainer:
         device as the model; each selected batch is moved to the model device
         before the forward pass.
 
-        If `shuffle` is True, the training data are shuffled at the start of
-        each epoch. Diagnostics are computed and stored every `epoch_diag_step`
+        By default, the training data are shuffled at the start of each epoch
+        (shuffle = True). Diagnostics are computed and stored every `epoch_diag_step`
         epochs. The recorded epoch loss is recomputed over the full training
         dataset in evaluation mode and is exact only when `loss_function`
         returns the mean per-sample loss over each batch.
@@ -208,7 +208,7 @@ class Trainer:
             Frequency, in epochs, at which diagnostics are computed and stored.
         verbose : bool, default=True
             If True, print diagnostic information during training.
-        shuffle : bool, default=False
+        shuffle : bool, default=True
             If True, shuffle the training data at the start of each epoch.
         x_valid : torch.Tensor, default=None
             Validation input.
