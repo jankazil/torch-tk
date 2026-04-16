@@ -355,12 +355,13 @@ class Trainer:
         figsize=(9, 6),
         xlim=None,
         ylim=None,
-        yscale='log',
+        xlog=False,
+        ylog=False,
         xlabel='Epoch',
         ylabel='Loss',
         show_plot=True,
         verbose=True,
-    ):
+    ) -> Path:
         '''
         Plot the recorded training loss versus epoch.
 
@@ -378,8 +379,10 @@ class Trainer:
             Limits for the x-axis.
         ylim : tuple, optional
             Limits for the y-axis.
-        yscale : str, default='log'
-            Scale used for the y-axis.
+        xlog:
+            If True, use a logarithmic x-axis.
+        ylog:
+            If True, use a logarithmic y-axis.
         xlabel : str, default='Epoch'
             Label for the x-axis.
         ylabel : str, default='Loss'
@@ -401,7 +404,15 @@ class Trainer:
                 self.diag_epochs, self.diag_epoch_valid_losses, color='blue', marker='o', linestyle='None', label='Validation'
             )
 
-        ax[0, 0].set_yscale(yscale)
+        if xlog:
+            ax[0, 0].set_xscale('log')
+        else:
+            ax[0, 0].set_xscale('linear')
+
+        if ylog:
+            ax[0, 0].set_yscale('log')
+        else:
+            ax[0, 0].set_yscale('linear')
 
         if xlim:
             ax[0, 0].set_xlim(xlim)
@@ -452,12 +463,13 @@ class Trainer:
         figsize=(9, 6),
         xlim=None,
         ylim=None,
-        yscale='log',
+        xlog=False,
+        ylog=False,
         xlabel='Epoch',
         ylabel='Wallclock time (s)',
         show_plot=True,
         verbose=True,
-    ):
+    ) -> Path:
         '''
         Plot the recorded epoch wallclock time versus epoch.
 
@@ -475,8 +487,10 @@ class Trainer:
             Limits for the x-axis.
         ylim : tuple, optional
             Limits for the y-axis.
-        yscale : str, default='log'
-            Scale used for the y-axis.
+        xlog:
+            If True, use a logarithmic x-axis.
+        ylog:
+            If True, use a logarithmic y-axis.
         xlabel : str, default='Epoch'
             Label for the x-axis.
         ylabel : str, default='Wallclock time (s)'
@@ -493,7 +507,15 @@ class Trainer:
 
         ax[0, 0].plot(self.diag_epochs, self.diag_epoch_wallclock_times, color='r', marker='o', linestyle='None')
 
-        ax[0, 0].set_yscale(yscale)
+        if xlog:
+            ax[0, 0].set_xscale('log')
+        else:
+            ax[0, 0].set_xscale('linear')
+
+        if ylog:
+            ax[0, 0].set_yscale('log')
+        else:
+            ax[0, 0].set_yscale('linear')
 
         if xlim:
             ax[0, 0].set_xlim(xlim)

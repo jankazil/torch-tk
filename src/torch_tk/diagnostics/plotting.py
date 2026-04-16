@@ -20,27 +20,85 @@ from .diagnostics import Diagnostics
 
 def plot_diagnostics(
     diagnostics: list[Diagnostics],
-    plot_file: Path = None,
+    plot_file: Path | str | None = None,
     title: str = None,
+    loss_name='sqrt(loss)',
     font_factor=1.5,
     figsize=(9, 6),
     xlim=None,
     ylim=None,
-    loss_name='sqrt(loss)',
-    pdf_bin_n=100,
+    xlog=False,
+    ylog=False,
     dpdlog10: bool = False,
+    pdf_bin_n=100,
+    pdf_log_grid=True,
     show_plot=True,
     verbose=True,
+    epoch_skip=1,
 ) -> None:
     '''
-    Plot kernel-density estimates of square-root per-sample loss distributions.
+    Plot kernel density estimates of square-rooted per-sample losses across epochs.
 
-    One or a list of Diagnostics objects are accepted. For each stored epoch, the
-    function estimates a density curve on a logarithmic grid, plots it, and can
-    optionally save the figure to disk and display it.
+    This function accepts one Diagnostics object or a list of them. For each selected
+    epoch in each diagnostic, it takes the per-sample losses for that epoch, computes
+    their square roots, fits a Gaussian kernel density estimate, and plots the resulting
+    density on a shared axis.
+
+    The x-axis represents sqrt(loss) by default. The density can optionally be converted
+    from dP/dsqrt(loss) to dP/dlog10(sqrt(loss)), which is useful for comparing mass
+    across scales on a logarithmic x-axis.
+
+    Args:
+        diagnostics:
+            A Diagnostics instance or a list of Diagnostics instances. Each diagnostic
+            must provide per-sample loss data indexed by epoch.
+        plot_file:
+            Output path for saving the figure. If None, the figure is not written to disk.
+        title:
+            Figure title. If None, no meaningful title is added.
+        loss_name:
+            Label used for the x-axis quantity. Default is 'sqrt(loss)'.
+        font_factor:
+            Multiplicative scaling applied to all font sizes in the figure.
+        figsize:
+            Figure size passed to matplotlib.
+        xlim:
+            Optional x-axis limits.
+        ylim:
+            Optional y-axis limits.
+        xlog:
+            If True, use a logarithmic x-axis unless overridden by dpdlog10 handling.
+        ylog:
+            If True, use a logarithmic y-axis.
+        dpdlog10:
+            If True, plot density per unit log10 of the x quantity rather than per unit
+            x. This also forces logarithmic scaling on the x-axis.
+        pdf_bin_n:
+            Number of grid points used to evaluate each KDE.
+        pdf_log_grid:
+            If True, evaluate the KDE on a logarithmically spaced grid when possible.
+            If the minimum plotted value is non-positive, a linear grid is used instead.
+        show_plot:
+            If True, display the figure with plt.show(). Otherwise close it after optional
+            saving.
+        verbose:
+            If True, print the saved plot path when plot_file is provided.
+        epoch_skip:
+            Plot every epoch_skip-th stored epoch.
+
+    Notes:
+        This function assumes that diagnostic.per_sample_loss is indexed in the same order
+        as diagnostic.epoch, with one per-sample loss array per stored epoch.
     '''
 
+    # Validate input
+
+    if epoch_skip < 1:
+        raise ValueError('epoch_skip must be >= 1')
+
     diagnostics = diagnostics if isinstance(diagnostics, list) else [diagnostics]
+
+    # Do your worst
 
     fig, ax = plt.subplots(figsize=figsize, nrows=1, ncols=1, squeeze=False)
 
@@ -58,16 +116,22 @@ def plot_diagnostics(
     grid_max = max([diagnostic.per_sample_loss.max().sqrt().item() for diagnostic in diagnostics])
 
     if grid_min <= 0:
-        raise ValueError('Cannot construct logarithmic grid as loss contains at least one value <= 0.')
+        xlog = False
+        pdf_log_grid = False
 
-    grid = np.logspace(np.log10(grid_min), np.log10(grid_max), pdf_bin_n)
+    if pdf_log_grid:
+        grid = np.logspace(np.log10(grid_min), np.log10(grid_max), pdf_bin_n)
+    else:
+        grid = np.linspace(grid_min, grid_max, pdf_bin_n)
 
     pdfs = []
 
     for diagnostic in diagnostics:
-        for n, epoch in enumerate(diagnostic.epoch):
+        for epoch_i in range(0, len(diagnostic.epoch), epoch_skip):
+            epoch = diagnostic.epoch[epoch_i]
+
             # Sample-resolved loss
-            model_losses = diagnostic.per_sample_loss[n].to(device='cpu')
+            model_losses = diagnostic.per_sample_loss[epoch_i].to(device='cpu')
 
             # Semple-resolved square root of loss
             model_rlosses = model_losses.sqrt()
@@ -75,7 +139,7 @@ def plot_diagnostics(
             # Construct the kernel density estimate
             kde = gaussian_kde(model_rlosses)
 
-            # Evaluate the probability density on a logarithmic grid
+            # Evaluate the probability density on the grid
             pdf = kde(grid)
 
             # Convert to probability density per unit log10(L): dP/dlog10(sqrt(L)) = ln(10) * sqrt(L) * dP/dsqrt(L)
@@ -109,13 +173,24 @@ def plot_diagnostics(
     ax[0, 0].legend(loc='best', fontsize=7, frameon=False)
 
     ax[0, 0].set_xlabel(loss_name)
+
     if dpdlog10:
         ax[0, 0].set_ylabel('Probability density dp/dlog10(' + loss_name + ')')
     else:
         ax[0, 0].set_ylabel('Probability density dp/d' + loss_name + '')
 
-    ax[0, 0].set_xscale('log')
-    ax[0, 0].set_yscale('log')
+    if dpdlog10:
+        ax[0, 0].set_xscale('log')
+    else:
+        if xlog:
+            ax[0, 0].set_xscale('log')
+        else:
+            ax[0, 0].set_xscale('linear')
+
+    if ylog:
+        ax[0, 0].set_yscale('log')
+    else:
+        ax[0, 0].set_yscale('linear')
 
     if xlim:
         ax[0, 0].set_xlim(xlim)
@@ -124,7 +199,6 @@ def plot_diagnostics(
     if ylim:
         ax[0, 0].set_ylim(ylim)
     else:
-        print(pdf_min, pdf_max)
         ax[0, 0].set_ylim([pdf_min, pdf_max])
 
     # Increase all font sizes by a given factor
@@ -145,4 +219,4 @@ def plot_diagnostics(
     else:
         plt.close(fig)
 
-    return plot_file
+    return
