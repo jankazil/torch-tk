@@ -49,10 +49,11 @@ class Trainer:
         self.epoch = epoch  # Number of completed epochs
 
         self.diag_epochs = []  # Epoch numbers at which diagnostics were performed
-        self.diag_epoch_losses = []  # Loss at epochs at which diagnostics were performed
+        self.diag_epoch_train_losses = []  # Training data loss at epochs at which diagnostics were performed
+        self.diag_epoch_valid_losses = []  # Validation data loss at epochs at which diagnostics were performed
         self.diag_epoch_wallclock_times = []  # Wallclock times for diagnostic epochs
 
-    def train_with_dataloader(self, data_loader, num_epochs, epoch_diag_step=1, verbose=True):
+    def train_with_dataloader(self, data_loader, num_epochs, epoch_diag_step=1, valid_data_loader=None, verbose=True):
         '''
         Train the model for a given number of epochs using a DataLoader.
 
@@ -65,16 +66,21 @@ class Trainer:
         in evaluation mode. This loss is exact only when `loss_function`
         returns the mean per-sample loss over each batch.
 
+        If a validation data loader is provided, additional diagnostics on the
+        validation data are computed and stored every `epoch_diag_step` epochs.
+
         Arguments
         ----------
         data_loader : DataLoader
-            Iterable yielding `(x_data, y_data)` batches.
+            Iterable yielding `(x_data, y_data)` batches for training.
         num_epochs : int
             Number of epochs to run.
         epoch_diag_step : int, default=1
             Frequency, in epochs, at which diagnostics are computed and stored.
         verbose : bool, default=True
             If True, print diagnostic information during training.
+        valid_data_loader : DataLoader, default=None
+            Iterable yielding `(x_data, y_data)` batches for validation.
         '''
 
         device = get_model_device(self.model)
@@ -109,6 +115,9 @@ class Trainer:
                 t1 = time.perf_counter()
                 epoch_wallclock_time = t1 - t0
 
+                self.diag_epochs.append(self.epoch)
+                self.diag_epoch_wallclock_times.append(epoch_wallclock_time)
+
                 # Calculate the loss over the entire training dataset. This is
                 # exact only when the loss function returns the mean of a per-sample
                 # loss over the batch, so that multiplying by batch size recovers
@@ -128,19 +137,47 @@ class Trainer:
 
                 epoch_loss /= len(data_loader.dataset)
 
-                self.diag_epochs.append(self.epoch)
-                self.diag_epoch_wallclock_times.append(epoch_wallclock_time)
-                self.diag_epoch_losses.append(epoch_loss)
+                self.diag_epoch_train_losses.append(epoch_loss)
+
+                # Calculate the loss over the entire validation dataset. This is
+                # exact only when the loss function returns the mean of a per-sample
+                # loss over the batch, so that multiplying by batch size recovers
+                # the batch sum of sample losses.
+
+                if valid_data_loader is not None:
+                    self.model.eval()
+
+                    epoch_valid_loss = 0.0
+
+                    with torch.no_grad():
+                        for x_data, y_data in valid_data_loader:
+                            x_data = x_data.to(device)
+                            y_data = y_data.to(device)
+
+                            loss = self.loss_function(self.model(x_data), y_data)
+                            epoch_valid_loss += loss.item() * x_data.shape[0]
+
+                    epoch_valid_loss /= len(valid_data_loader.dataset)
+
+                    self.diag_epoch_valid_losses.append(epoch_valid_loss)
 
                 if verbose:
-                    print(
-                        f'\rTraining epoch {self.epoch} wallclock time (s): {epoch_wallclock_time:.4E}, loss: {epoch_loss:.6f}',
-                        end='\n',
-                    )
+                    if valid_data_loader is None:
+                        print(
+                            f'\rTraining epoch {self.epoch} wallclock time (s): {epoch_wallclock_time:.4E}, training loss : {epoch_loss:.6f}',
+                            end='\n',
+                        )
+                    else:
+                        print(
+                            f'\rTraining epoch {self.epoch} wallclock time (s): {epoch_wallclock_time:.4E}, training loss : {epoch_loss:.6f}, validation loss : {epoch_valid_loss:.6f}',
+                            end='\n',
+                        )
 
         return
 
-    def train_with_data(self, x_train, y_train, bs, num_epochs, epoch_diag_step=1, verbose=True, shuffle=False):
+    def train_with_data(
+        self, x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=False, verbose=True
+    ):
         '''
         Train the model for a given number of epochs using input and target tensors.
 
@@ -153,6 +190,9 @@ class Trainer:
         epochs. The recorded epoch loss is recomputed over the full training
         dataset in evaluation mode and is exact only when `loss_function`
         returns the mean per-sample loss over each batch.
+
+        If both x_valid and y_valid are provided, additional diagnostics on the
+        validation data are computed and stored every `epoch_diag_step` epochs.
 
         Arguments
         ----------
@@ -170,6 +210,10 @@ class Trainer:
             If True, print diagnostic information during training.
         shuffle : bool, default=False
             If True, shuffle the training data at the start of each epoch.
+        x_valid : torch.Tensor, default=None
+            Validation input.
+        y_valid : torch.Tensor, default=None
+            Validation targets corresponding to `x_valid`.
         '''
 
         device = get_model_device(self.model)
@@ -223,6 +267,9 @@ class Trainer:
                 t1 = time.perf_counter()
                 epoch_wallclock_time = t1 - t0
 
+                self.diag_epochs.append(self.epoch)
+                self.diag_epoch_wallclock_times.append(epoch_wallclock_time)
+
                 # Calculate the loss over the entire training dataset. This is
                 # exact only when the loss function returns the mean of a per-sample
                 # loss over the batch, so that multiplying by batch size recovers
@@ -252,15 +299,51 @@ class Trainer:
 
                 epoch_loss /= data_n
 
-                self.diag_epochs.append(self.epoch)
-                self.diag_epoch_wallclock_times.append(epoch_wallclock_time)
-                self.diag_epoch_losses.append(epoch_loss)
+                self.diag_epoch_train_losses.append(epoch_loss)
+
+                # Calculate the loss over the entire validation dataset. This is
+                # exact only when the loss function returns the mean of a per-sample
+                # loss over the batch, so that multiplying by batch size recovers
+                # the batch sum of sample losses.
+
+                if x_valid is not None and y_valid is not None:
+                    self.model.eval()
+
+                    valid_n = x_valid.shape[0]
+
+                    epoch_valid_loss = 0.0
+
+                    with torch.no_grad():
+                        # Iterate over all full batches, plus one final (possibly smaller) batch
+                        for i in range((valid_n - 1) // bs + 1):
+                            # Select batch
+                            start_i = i * bs
+                            end_i = (
+                                start_i + bs
+                            )  # the last end_i may be greater than the number of validation instances; slicing used next keeps indices in bounds
+
+                            x_data = x_valid[start_i:end_i].to(device)
+                            y_data = y_valid[start_i:end_i].to(device)
+
+                            loss = self.loss_function(self.model(x_data), y_data)
+
+                            epoch_valid_loss += loss.item() * x_data.shape[0]
+
+                    epoch_valid_loss /= valid_n
+
+                    self.diag_epoch_valid_losses.append(epoch_valid_loss)
 
                 if verbose:
-                    print(
-                        f'\rTraining epoch {self.epoch} wallclock time (s): {epoch_wallclock_time:.4E}, loss: {epoch_loss:.6f}',
-                        end='\n',
-                    )
+                    if x_valid is None or y_valid is None:
+                        print(
+                            f'\rTraining epoch {self.epoch} wallclock time (s): {epoch_wallclock_time:.4E}, training loss : {epoch_loss:.6f}',
+                            end='\n',
+                        )
+                    else:
+                        print(
+                            f'\rTraining epoch {self.epoch} wallclock time (s): {epoch_wallclock_time:.4E}, training loss : {epoch_loss:.6f}, validation loss : {epoch_valid_loss:.6f}',
+                            end='\n',
+                        )
 
         return
 
@@ -311,7 +394,12 @@ class Trainer:
 
         plt.suptitle(title, y=0.93, fontsize=8)
 
-        ax[0, 0].plot(self.diag_epochs, self.diag_epoch_losses, color='r', marker='o', linestyle='None')
+        ax[0, 0].plot(self.diag_epochs, self.diag_epoch_train_losses, color='r', marker='o', linestyle='None', label='Training')
+
+        if len(self.diag_epoch_valid_losses) > 0:
+            ax[0, 0].plot(
+                self.diag_epochs, self.diag_epoch_valid_losses, color='blue', marker='o', linestyle='None', label='Validation'
+            )
 
         ax[0, 0].set_yscale(yscale)
 
@@ -322,7 +410,12 @@ class Trainer:
         if ylim:
             ax[0, 0].set_ylim(ylim)
         else:
-            ax[0, 0].set_ylim([min(self.diag_epoch_losses), max(self.diag_epoch_losses)])
+            if len(self.diag_epoch_valid_losses) == 0:
+                ax[0, 0].set_ylim([min(self.diag_epoch_train_losses), max(self.diag_epoch_train_losses)])
+            else:
+                ax[0, 0].set_ylim([min(self.diag_epoch_train_losses + self.diag_epoch_valid_losses), max(self.diag_epoch_train_losses + self.diag_epoch_valid_losses)])
+
+        ax[0, 0].legend(loc='best', fontsize=7, frameon=False)
 
         ax[0, 0].set_xlabel(xlabel)
         ax[0, 0].set_ylabel(ylabel)
