@@ -98,8 +98,8 @@ Wrapper around `torch.optim.Adam` to make it self-describing and automatically r
 Provides the `Trainer` class for epoch-based training and simple training diagnostics.
 
 - `Trainer(model, optimizer, loss_function, epoch=0)`: Initialize trainer state.
-- `Trainer.train_with_dataloader(data_loader, num_epochs, epoch_diag_step=1, verbose=True)`: Train from a `DataLoader`.
-- `Trainer.train_with_data(x_train, y_train, bs, num_epochs, epoch_diag_step=1, verbose=True, shuffle=False)`: Train from in-memory tensors.
+- `Trainer.train_with_dataloader(data_loader, num_epochs, epoch_diag_step=1, valid_data_loader=None, verbose=True)`: Train from a `DataLoader`.
+- `Trainer.train_with_data(x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=False, verbose=True)`: Train from in-memory tensors.
 - `Trainer.plot_loss(...)`: Plot recorded diagnostic loss versus epoch.
 - `Trainer.plot_wallclock_time(...)`: Plot recorded epoch wallclock time versus epoch.
 
