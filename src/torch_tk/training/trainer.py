@@ -413,7 +413,12 @@ class Trainer:
             if len(self.diag_epoch_valid_losses) == 0:
                 ax[0, 0].set_ylim([min(self.diag_epoch_train_losses), max(self.diag_epoch_train_losses)])
             else:
-                ax[0, 0].set_ylim([min(self.diag_epoch_train_losses + self.diag_epoch_valid_losses), max(self.diag_epoch_train_losses + self.diag_epoch_valid_losses)])
+                ax[0, 0].set_ylim(
+                    [
+                        min(self.diag_epoch_train_losses + self.diag_epoch_valid_losses),
+                        max(self.diag_epoch_train_losses + self.diag_epoch_valid_losses),
+                    ]
+                )
 
         ax[0, 0].legend(loc='best', fontsize=7, frameon=False)
 
