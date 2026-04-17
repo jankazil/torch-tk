@@ -102,7 +102,7 @@ def plot_diagnostics(
 
     fig, ax = plt.subplots(figsize=figsize, nrows=1, ncols=1, squeeze=False)
 
-    plt.suptitle(title, y=0.93, fontsize=8)
+    plt.suptitle(title, y=0.94, fontsize=8)
 
     for diagnostic in diagnostics:
         if diagnostic.per_sample_loss is None:
@@ -127,7 +127,7 @@ def plot_diagnostics(
     pdfs = []
 
     for diagnostic in diagnostics:
-        for epoch_i in range(0, len(diagnostic.epoch), epoch_skip):
+        for epoch_i in range(len(diagnostic.epoch) - 1, 0, -epoch_skip):
             epoch = diagnostic.epoch[epoch_i]
 
             # Sample-resolved loss
