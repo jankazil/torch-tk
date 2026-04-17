@@ -395,7 +395,7 @@ class Trainer:
 
         fig, ax = plt.subplots(figsize=figsize, nrows=1, ncols=1, squeeze=False)
 
-        plt.suptitle(title, y=0.93, fontsize=8)
+        plt.suptitle(title, y=0.94, fontsize=8)
 
         ax[0, 0].plot(self.diag_epochs, self.diag_epoch_train_losses, color='r', marker='o', linestyle='None', label='Training')
 
@@ -503,7 +503,7 @@ class Trainer:
 
         fig, ax = plt.subplots(figsize=figsize, nrows=1, ncols=1, squeeze=False)
 
-        plt.suptitle(title, y=0.93, fontsize=8)
+        plt.suptitle(title, y=0.94, fontsize=8)
 
         ax[0, 0].plot(self.diag_epochs, self.diag_epoch_wallclock_times, color='r', marker='o', linestyle='None')
 
