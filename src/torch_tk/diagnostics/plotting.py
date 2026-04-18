@@ -127,7 +127,7 @@ def plot_diagnostics(
     pdfs = []
 
     for diagnostic in diagnostics:
-        for epoch_i in range(len(diagnostic.epoch) - 1, 0, -epoch_skip):
+        for epoch_i in range(len(diagnostic.epoch) - 1, -1, -epoch_skip):
             epoch = diagnostic.epoch[epoch_i]
 
             # Sample-resolved loss
