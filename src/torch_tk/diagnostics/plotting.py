@@ -22,7 +22,7 @@ def plot_diagnostics(
     diagnostics: list[Diagnostics],
     plot_file: Path | str | None = None,
     title: str = None,
-    loss_name='sqrt(loss)',
+    loss_name='Loss',
     font_factor=1.5,
     figsize=(9, 6),
     xlim=None,
@@ -44,9 +44,9 @@ def plot_diagnostics(
     their square roots, fits a Gaussian kernel density estimate, and plots the resulting
     density on a shared axis.
 
-    The x-axis represents sqrt(loss) by default. The density can optionally be converted
-    from dP/dsqrt(loss) to dP/dlog10(sqrt(loss)), which is useful for comparing mass
-    across scales on a logarithmic x-axis.
+    The x-axis represents loss by default. The density can optionally be converted
+    from dP/d(loss) to dP/dlog10(loss), which is useful for comparing the probability
+    density across scales on a logarithmic x-axis.
 
     Args:
         diagnostics:
@@ -57,7 +57,7 @@ def plot_diagnostics(
         title:
             Figure title. If None, no meaningful title is added.
         loss_name:
-            Label used for the x-axis quantity. Default is 'sqrt(loss)'.
+            Label used for the x-axis quantity. Default is 'Loss'.
         font_factor:
             Multiplicative scaling applied to all font sizes in the figure.
         figsize:
@@ -112,8 +112,8 @@ def plot_diagnostics(
 
     # Construct PDF grid
 
-    grid_min = min([diagnostic.per_sample_loss.min().sqrt().item() for diagnostic in diagnostics])
-    grid_max = max([diagnostic.per_sample_loss.max().sqrt().item() for diagnostic in diagnostics])
+    grid_min = min([diagnostic.per_sample_loss.min().item() for diagnostic in diagnostics])
+    grid_max = max([diagnostic.per_sample_loss.max().item() for diagnostic in diagnostics])
 
     if grid_min <= 0:
         xlog = False
@@ -133,17 +133,14 @@ def plot_diagnostics(
             # Sample-resolved loss
             model_losses = diagnostic.per_sample_loss[epoch_i].to(device='cpu')
 
-            # Semple-resolved square root of loss
-            model_rlosses = model_losses.sqrt()
-
             # Construct the kernel density estimate
-            kde = gaussian_kde(model_rlosses)
+            kde = gaussian_kde(model_losses)
 
             # Evaluate the probability density on the grid
             pdf = kde(grid)
 
-            # Convert to probability density per unit log10(L): dP/dlog10(sqrt(L)) = ln(10) * sqrt(L) * dP/dsqrt(L)
-            # This will allow comparing values across scales when plotting sqrt(L) using a logarithmic grid.
+            # Convert to probability density per unit log10(L): dP/dlog10(L) = ln(10) * L * dP/dL
+            # This will allow comparing values across scales when plotting L using a logarithmic grid.
             if dpdlog10:
                 pdf = np.log(10) * grid * pdf
 
@@ -177,7 +174,7 @@ def plot_diagnostics(
     if dpdlog10:
         ax[0, 0].set_ylabel('Probability density dp/dlog10(' + loss_name + ')')
     else:
-        ax[0, 0].set_ylabel('Probability density dp/d' + loss_name + '')
+        ax[0, 0].set_ylabel('Probability density dp/d(' + loss_name + ')')
 
     if dpdlog10:
         ax[0, 0].set_xscale('log')

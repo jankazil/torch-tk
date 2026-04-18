@@ -134,13 +134,12 @@ Provides the `Diagnostics` container for sample-resolved loss diagnostics and an
 
 Provides utilities for plotting diagnostics.
 
-- `plot_diagnostics(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='sqrt(loss)', pdf_bin_n=100, dpdlog10=False, show_plot=True, verbose=True)`: Plot kernel-density estimates of square-root per-sample loss distributions across one or more diagnostics objects and epochs.
+- `plot_diagnostics(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', pdf_bin_n=100, dpdlog10=False, show_plot=True, verbose=True)`: Plot kernel-density-estimated loss probability distribution functions (PDFs) across one or more diagnostics objects and epochs.
 
 ## Notes and limitations
 
 - The checkpoint mechanism assumes that models and optimizers are importable from stable class paths and expose `constructor_dict()`, `state_dict()`, and `load_state_dict()`.
 - The checkpoint design is not suitable for optimizers that require non-serializable constructor inputs or custom parameter-group reconstruction beyond `model.parameters()`.
-- The diagnostic plotting utility requires strictly positive, non-negative loss values because it plots the square root of loss on a logarithmic axis.
 - The recorded epoch loss in `Trainer` is exact only when the supplied loss function returns the mean per-sample loss over each batch, as stated in the trainer docstrings.
 
 ## Development
