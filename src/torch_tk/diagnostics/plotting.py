@@ -1,9 +1,8 @@
 '''
 Plotting utilities for sample-resolved diagnostics.
 
-This module provides a function to estimate and plot probability density curves
-for the square root of per-sample loss values across one or more diagnostics
-objects and training epochs.
+This module provides a function to estimate and plot probability density functions
+of the per-sample loss across one or more diagnostics objects and training epochs.
 '''
 
 from __future__ import annotations
@@ -37,12 +36,12 @@ def plot_diagnostics(
     epoch_skip=1,
 ) -> None:
     '''
-    Plot kernel density estimates of square-rooted per-sample losses across epochs.
+    Plot kernel density estimates of the per-sample loss probability density function (PDF).
 
     This function accepts one Diagnostics object or a list of them. For each selected
-    epoch in each diagnostic, it takes the per-sample losses for that epoch, computes
-    their square roots, fits a Gaussian kernel density estimate, and plots the resulting
-    density on a shared axis.
+    epoch in each diagnostic, it takes the per-sample losses for that epoch, determines the
+    probability density function using a Gaussian kernel density estimate, and plots the
+    resulting PDFs on a shared axis.
 
     The x-axis represents loss by default. The density can optionally be converted
     from dP/d(loss) to dP/dlog10(loss), which is useful for comparing the probability
@@ -107,8 +106,6 @@ def plot_diagnostics(
     for diagnostic in diagnostics:
         if diagnostic.per_sample_loss is None:
             raise ValueError('Each diagnostic must contain per-sample loss data.')
-        if (diagnostic.per_sample_loss < 0).any():
-            raise ValueError('Per-sample losses must be non-negative, as their square root is calculated.')
 
     # Construct PDF grid
 
