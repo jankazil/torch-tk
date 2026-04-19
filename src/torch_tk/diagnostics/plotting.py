@@ -18,9 +18,9 @@ from .diagnostics import Diagnostics
 
 
 def plot_diagnostics(
-    diagnostics: list[Diagnostics],
+    diagnostics: Diagnostics | list[Diagnostics],
     plot_file: Path | str | None = None,
-    title: str = None,
+    title: str | None = None,
     loss_name='Loss',
     font_factor=1.5,
     figsize=(9, 6),
@@ -30,7 +30,6 @@ def plot_diagnostics(
     ylog=False,
     dpdlog10: bool = False,
     pdf_bin_n=100,
-    pdf_log_grid=True,
     show_plot=True,
     verbose=True,
     epoch_skip=1,
@@ -38,23 +37,28 @@ def plot_diagnostics(
     '''
     Plot kernel density estimates of the per-sample loss probability density function (PDF).
 
+    The loss values must be > 0 as the kernel density estimation is done in log-space of
+    the loss values.
+
     This function accepts one Diagnostics object or a list of them. For each selected
     epoch in each diagnostic, it takes the per-sample losses for that epoch, determines the
-    probability density function using a Gaussian kernel density estimate, and plots the
-    resulting PDFs on a shared axis.
+    probability density function using a Gaussian kernel density estimate in log-loss space,
+    and plots the resulting PDFs on a shared axis.
 
     The x-axis represents loss by default. The density can optionally be converted
     from dP/d(loss) to dP/dlog10(loss), which is useful for comparing the probability
     density across scales on a logarithmic x-axis.
 
-    Args:
+    Arguments:
+
         diagnostics:
             A Diagnostics instance or a list of Diagnostics instances. Each diagnostic
-            must provide per-sample loss data indexed by epoch.
+            must provide per-sample loss data indexed by epoch, and all loss values
+            must be strictly positive.
         plot_file:
             Output path for saving the figure. If None, the figure is not written to disk.
         title:
-            Figure title. If None, no meaningful title is added.
+            Figure title.
         loss_name:
             Label used for the x-axis quantity. Default is 'Loss'.
         font_factor:
@@ -74,9 +78,6 @@ def plot_diagnostics(
             x. This also forces logarithmic scaling on the x-axis.
         pdf_bin_n:
             Number of grid points used to evaluate each KDE.
-        pdf_log_grid:
-            If True, evaluate the KDE on a logarithmically spaced grid when possible.
-            If the minimum plotted value is non-positive, a linear grid is used instead.
         show_plot:
             If True, display the figure with plt.show(). Otherwise close it after optional
             saving.
@@ -86,6 +87,7 @@ def plot_diagnostics(
             Plot every epoch_skip-th stored epoch.
 
     Notes:
+
         This function assumes that diagnostic.per_sample_loss is indexed in the same order
         as diagnostic.epoch, with one per-sample loss array per stored epoch.
     '''
@@ -97,31 +99,32 @@ def plot_diagnostics(
 
     diagnostics = diagnostics if isinstance(diagnostics, list) else [diagnostics]
 
+    for diagnostic in diagnostics:
+        if diagnostic.per_sample_loss is None:
+            raise ValueError('Each diagnostic must contain per-sample loss data.')
+
+    loss_min = min([diagnostic.per_sample_loss.min().item() for diagnostic in diagnostics])
+    loss_max = max([diagnostic.per_sample_loss.max().item() for diagnostic in diagnostics])
+
+    if loss_min <= 0:
+        raise ValueError('Each diagnostic must contain only positive loss values.')
+
     # Do your worst
 
     fig, ax = plt.subplots(figsize=figsize, nrows=1, ncols=1, squeeze=False)
 
     plt.suptitle(title, y=0.94, fontsize=8)
 
-    for diagnostic in diagnostics:
-        if diagnostic.per_sample_loss is None:
-            raise ValueError('Each diagnostic must contain per-sample loss data.')
-
     # Construct PDF grid
 
-    grid_min = min([diagnostic.per_sample_loss.min().item() for diagnostic in diagnostics])
-    grid_max = max([diagnostic.per_sample_loss.max().item() for diagnostic in diagnostics])
+    grid_min = 0.1 * loss_min
+    grid_max = 10 * loss_max
 
-    if grid_min <= 0:
-        xlog = False
-        pdf_log_grid = False
-
-    if pdf_log_grid:
-        grid = np.logspace(np.log10(grid_min), np.log10(grid_max), pdf_bin_n)
-    else:
-        grid = np.linspace(grid_min, grid_max, pdf_bin_n)
+    grid = np.logspace(np.log10(grid_min), np.log10(grid_max), pdf_bin_n)
 
     pdfs = []
+
+    # Calculate and plot PDFs
 
     for diagnostic in diagnostics:
         for epoch_i in range(len(diagnostic.epoch) - 1, -1, -epoch_skip):
@@ -131,10 +134,10 @@ def plot_diagnostics(
             model_losses = diagnostic.per_sample_loss[epoch_i].to(device='cpu')
 
             # Construct the kernel density estimate
-            kde = gaussian_kde(model_losses)
+            kde = gaussian_kde(model_losses.log())
 
             # Evaluate the probability density on the grid
-            pdf = kde(grid)
+            pdf = kde(np.log(grid)) / grid
 
             # Convert to probability density per unit log10(L): dP/dlog10(L) = ln(10) * L * dP/dL
             # This will allow comparing values across scales when plotting L using a logarithmic grid.
