@@ -17,7 +17,7 @@ from scipy.stats import gaussian_kde
 from .diagnostics import Diagnostics
 
 
-def plot_diagnostics(
+def plot_positive_loss_kde_pdf(
     diagnostics: Diagnostics | list[Diagnostics],
     plot_file: Path | str | None = None,
     title: str | None = None,

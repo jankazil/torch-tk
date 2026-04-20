@@ -134,7 +134,7 @@ Provides the `Diagnostics` container for sample-resolved loss diagnostics and an
 
 Provides utilities for plotting diagnostics.
 
-- `plot_diagnostics(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', pdf_bin_n=100, dpdlog10=False, show_plot=True, verbose=True)`: Plot kernel-density-estimated loss probability distribution functions (PDFs) across one or more diagnostics objects and epochs.
+- `plot_positive_loss_kde_pdf(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', pdf_bin_n=100, dpdlog10=False, show_plot=True, verbose=True)`: Plot kernel-density-estimated probability distribution functions (PDFs) of loss values across one or more diagnostics objects and epochs. All loss values must be positive.
 
 ## Notes and limitations
 
