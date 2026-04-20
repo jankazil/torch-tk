@@ -134,7 +134,11 @@ Provides the `Diagnostics` container for sample-resolved loss diagnostics and an
 
 Provides utilities for plotting diagnostics.
 
-- `plot_positive_loss_kde_pdf(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', pdf_bin_n=100, dpdlog10=False, show_plot=True, verbose=True)`: Plot kernel-density-estimated probability distribution functions (PDFs) of loss values across one or more diagnostics objects and epochs. All loss values must be positive.
+- `plot_positive_loss_kde_pdf(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', xlog=False, ylog=False, bin_n=100, per_dlog10=False, show_plot=True, verbose=True, epoch_skip=1)`: Plot kernel-density-estimated probability distribution functions (PDFs) of positive loss values across one or more diagnostics objects and epochs. Optionally plot density per unit `log10(loss)` instead of per unit loss. All loss values must be positive.
+
+- `plot_positive_loss_hist_pdf(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', xlog=False, ylog=False, bin_n=25, per_dlog10=False, show_plot=True, verbose=True, epoch_skip=1)`: Plot histogram-based probability distribution functions (PDFs) of positive loss values across one or more diagnostics objects and epochs using logarithmically spaced bins. Optionally plot density per unit `log10(loss)` instead of per unit loss. All loss values must be positive.
+
+- `plot_positive_loss_hist_1st_moment_density(diagnostics, plot_file=None, title=None, font_factor=1.5, figsize=(9, 6), xlim=None, ylim=None, loss_name='Loss', xlog=False, ylog=False, bin_n=25, per_dlog10=False, show_plot=True, verbose=True, epoch_skip=1)`: Plot histogram-based first-moment densities of positive loss values across one or more diagnostics objects and epochs using logarithmically spaced bins. By default, this plots `loss · dP/d(loss)`; optionally it can plot `loss · dP/dlog10(loss)` for logarithmic comparison across scales. All loss values must be positive.
 
 ## Notes and limitations
 
