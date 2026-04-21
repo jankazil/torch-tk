@@ -55,7 +55,7 @@ class CheckPointManager:
         self.optimizer = optimizer
         self.directory = directory
 
-    def save(self, epoch):
+    def save(self, epoch, batch_size):
         '''
         Save a checkpoint for the current model and optimizer state.
 
@@ -69,6 +69,7 @@ class CheckPointManager:
 
         checkpoint = {
             'epoch': epoch,
+            'batch_size': batch_size,
             'model_class_path': class_path_of_instance(self.model),
             'model_constructor_dict': self.model.constructor_dict(),
             'model_state_dict': self.model.state_dict(),
@@ -136,4 +137,6 @@ class CheckPointManager:
 
         epoch = checkpoint['epoch']
 
-        return checkpoint_manager, model, optimizer, epoch
+        batch_size = checkpoint['batch_size']
+
+        return checkpoint_manager, model, optimizer, epoch, batch_size

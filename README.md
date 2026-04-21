@@ -108,8 +108,8 @@ Provides the `Trainer` class for epoch-based training and simple training diagno
 Provides checkpoint management for saving and reconstructing a model and optimizer together.
 
 - `CheckPointManager(model, optimizer, directory)`: Manage checkpoint saving in a directory.
-- `CheckPointManager.save(epoch)`: Save a checkpoint containing epoch, class paths, constructor dictionaries, and state dictionaries.
-- `CheckPointManager.load_from_file(file_path, device=None)`: Reconstruct and return `checkpoint_manager, model, optimizer, epoch` from a checkpoint file.
+- `CheckPointManager.save(epoch, batch_size)`: Save a checkpoint containing epoch, class paths, constructor dictionaries, and state dictionaries.
+- `CheckPointManager.load_from_file(file_path, device=None)`: Reconstruct and return `checkpoint_manager, model, optimizer, epoch, batch_size` from a checkpoint file.
 
 #### `torch_tk.diagnostics.loss`
 
