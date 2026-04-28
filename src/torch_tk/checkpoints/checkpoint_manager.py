@@ -78,7 +78,7 @@ class CheckPointManager:
             'optimizer_state_dict': self.optimizer.state_dict(),
         }
 
-        file_name = Path(type(self.model).__name__ + '.' + type(self.optimizer).__name__ + '.epoch=' + str(epoch) + '.pt')
+        file_name = 'checkpoint.epoch=' + str(epoch) + '.pt'
 
         self.directory.mkdir(parents=True, exist_ok=True)
 

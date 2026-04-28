@@ -237,16 +237,7 @@ class Diagnostics:
             directory = Path(directory)
 
         file_name = Path(
-            self.model
-            + '.'
-            + self.optimizer
-            + '.'
-            + self.description
-            + '.epoch='
-            + str(self.epoch[0])
-            + '_to_'
-            + str(self.epoch[-1])
-            + '.nc'
+            'diagnostics' + '.' + self.description + '.epoch=' + str(self.epoch[0]) + '_to_' + str(self.epoch[-1]) + '.nc'
         )
 
         # Create Xarray dataset
