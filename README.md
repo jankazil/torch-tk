@@ -32,8 +32,9 @@ pip install torch-tk
 ```bash
 mamba install -c jan.kazil -c conda-forge torch-tk
 ```
+## Public API
 
-## Classes
+### Classes
 
 - `Model`
   
@@ -61,8 +62,6 @@ mamba install -c jan.kazil -c conda-forge torch-tk
   - Computes, stores, and plots per-sample loss and per-sample loss probability distribution
   - Saves and restores diagnostics in netCDF file format
   - Identifies worst-loss samples
-
-## Public API
 
 ### Modules
 
@@ -121,11 +120,11 @@ Provides utilities for computing per-sample loss.
 
 #### `torch_tk.diagnostics.diagnostics`
 
-Provides the `Diagnostics` container for sample-resolved loss diagnostics and analysis.
+Provides the `Diagnostics` class for sample-resolved loss diagnostics and analysis.
 
-- `Diagnostics.from_data_loader(...)`: Build diagnostics from a model evaluated on a `DataLoader`.
-- `Diagnostics.from_data(...)`: Build diagnostics from in-memory tensors.
-- `Diagnostics.from_netcdf(path)`: Restore diagnostics from a saved netCDF file.
+- `Diagnostics.from_data_loader(...)`: Build a diagnostics object from a model evaluated on a `DataLoader`.
+- `Diagnostics.from_data(...)`: Build a diagnostics object from in-memory tensors.
+- `Diagnostics.from_netcdf(path)`: Restore a diagnostics object from a saved netCDF file.
 - `Diagnostics(...)`: Construct a diagnostics object from metadata, epochs, and per-sample loss data.
 - `Diagnostics.__add__(other)`: Concatenate compatible diagnostics across epochs.
 - `Diagnostics.to_netcdf(directory, verbose=True)`: Save diagnostics to a netCDF file.
