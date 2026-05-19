@@ -4,6 +4,23 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# Locate and enter the Git project root, so this script can live in scripts/
+# and still be called from any working directory.
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SCRIPT_SOURCE" ]]; do
+    SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" >/dev/null 2>&1 && pwd)"
+    SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+    [[ "$SCRIPT_SOURCE" != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" >/dev/null 2>&1 && pwd)"
+
+if PROJECT_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+    cd "$PROJECT_ROOT"
+else
+    echo "Error: could not locate the Git project root from $SCRIPT_DIR." >&2
+    exit 1
+fi
+
 # Check that Python is available
 if ! command -v python >/dev/null 2>&1; then
     echo "Error: python is not installed or not in PATH."
