@@ -4,11 +4,21 @@ channels:
 dependencies:
   - python=3.12
   - pip
+  - pipreqs
+  - pre-commit
+  - ruff
+  - mypy
   - mamba
-  - torch
+  - pytorch-gpu
+  - cuda-cudart-dev
+  - cuda-nvcc
   - numpy
   - xarray
   - matplotlib
   - scipy
+  - jupyter_client
+  - jupyter_core
+  - notebook
+  - ipykernel
   - pip:
       - git+https://github.com/jankazil/torch-tk
