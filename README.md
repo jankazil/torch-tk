@@ -14,12 +14,17 @@
 
 **torch-tk** provides a `CheckPointManager`. The `CheckPointManager` manages saving, loading, and reconstruing both the model and the optimizer in the state that created the checkpoint. All that is required is that the class paths are available to import the original model and optimizer classes.
 
-**torch-tk** provides a `Trainer` class for running epoch-based training. It supports training either from a `DataLoader` or directly from tensors, and records basic diagnostics such as training loss and epoch wallclock time.
+**torch-tk** provides trainer classes for epoch-based PyTorch training. It includes:
+
+* a standard `Trainer` for targets without missing values,  
+* a `MaskedTrainer` for targets that may contain missing values represented by `NaN`.  
+
+Both trainers support training either from a `DataLoader` or directly from tensors, and record basic diagnostics such as loss and epoch wallclock time.
 
 **torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to and restored from netCDF files for later analysis.
 
 ## Workflow
-The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. 
+The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook.
 
 ## Installation
 
@@ -37,7 +42,7 @@ mamba install -c jan.kazil -c conda-forge torch-tk
 ### Classes
 
 - `Model`
-  
+
   - A base class which makes models self-describing and automatically reconstructible by the `CheckPointManager`
   - Automatically rebuilds a model from a saved file
 
@@ -46,14 +51,26 @@ mamba install -c jan.kazil -c conda-forge torch-tk
    Wrapper classes for PyTorch optimizers that make the optimizers self-describing and automatically reconstructible by the `CheckPointManager`
 
 - `Trainer`
-  
+
   - Trains a model from
     - a `torch.utils.data.DataLoader`
     - or directly from tensors, using an efficient batching mechanism
   - Records training loss and model timing per epoch
 
+- `MaskedTrainer`
+
+  - Trains a model when target tensors may contain missing values represented by `NaN`
+  - Requires a masked loss function that
+    - excludes `NaN` target values before computing the loss
+    - returns both the scalar loss and the number of valid prediction-target pairs used in the loss calculation
+  - Trains from
+    - a `torch.utils.data.DataLoader`
+    - or directly from tensors, using an efficient batching mechanism
+  - Skips batches with no valid target values
+  - Records training loss, optional validation loss, and model timing per diagnostic epoch
+
 - `CheckPointManager`
-  
+
   - Saves and restores model training states
   - Automatically rebuilds both a model and its optimizer from a saved checkpoint file
 
@@ -94,13 +111,42 @@ Wrapper around `torch.optim.Adam` to make it self-describing and automatically r
 
 #### `torch_tk.training.trainer`
 
-Provides the `Trainer` class for epoch-based training and simple training diagnostics.
+Provides trainer classes for epoch-based PyTorch training and simple diagnostics.
 
-- `Trainer(model, optimizer, loss_function, epoch=0)`: Initialize trainer state.
-- `Trainer.train_with_dataloader(data_loader, num_epochs, epoch_diag_step=1, valid_data_loader=None, verbose=True)`: Train from a `DataLoader`.
-- `Trainer.train_with_data(x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=True, verbose=True)`: Train from in-memory tensors.
-- `Trainer.plot_loss(...)`: Plot recorded diagnostic loss versus epoch.
-- `Trainer.plot_wallclock_time(...)`: Plot recorded epoch wallclock time versus epoch.
+* `Trainer`
+
+  * Standard trainer for targets without missing values.
+  * Constructor
+
+    * `Trainer(model, optimizer, loss_function, epoch=0)`: Initialize trainer state with a scalar loss function.
+  * Training methods
+
+    * `Trainer.train_with_dataloader(data_loader, num_epochs, epoch_diag_step=1, valid_data_loader=None, verbose=True)`: Train from a `DataLoader`.
+    * `Trainer.train_with_data(x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=True, verbose=True)`: Train from in-memory tensors.
+  * Plotting methods
+
+    * `Trainer.plot_loss(...)`: Plot recorded diagnostic loss versus epoch.
+    * `Trainer.plot_wallclock_time(...)`: Plot recorded epoch wallclock time versus epoch.
+
+* `MaskedTrainer`
+
+  * Trainer for targets that may contain missing values represented by `NaN`.
+  * Constructor
+
+    * `MaskedTrainer(model, optimizer, masked_loss_function, epoch=0)`: Initialize trainer state with a masked loss function.
+  * Required masked-loss behavior
+
+    * Exclude `NaN` target values before subtraction, squaring, or other loss operations.
+    * Return `(loss, target_valid_n)`, where `target_valid_n` is the number of valid prediction-target pairs used in the loss calculation.
+    * Allow batches with `target_valid_n == 0` to be skipped.
+  * Training methods
+
+    * `MaskedTrainer.train_with_dataloader(data_loader, num_epochs, epoch_diag_step=1, valid_data_loader=None, verbose=True)`: Train from a `DataLoader`, skipping batches with no valid target values.
+    * `MaskedTrainer.train_with_data(x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=True, verbose=True)`: Train from in-memory tensors, skipping batches with no valid target values.
+  * Plotting methods
+
+    * `MaskedTrainer.plot_loss(...)`: Plot recorded diagnostic training loss and, when available, validation loss versus epoch.
+    * `MaskedTrainer.plot_wallclock_time(...)`: Plot recorded epoch wallclock time versus epoch.
 
 #### `torch_tk.checkpoints.checkpoint_manager`
 
