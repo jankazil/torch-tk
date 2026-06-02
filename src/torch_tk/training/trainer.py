@@ -220,7 +220,7 @@ class Trainer:
 
         data_device = x_train.device
 
-        data_n = x_train.shape[0]
+        train_data_n = x_train.shape[0]
 
         start_epoch = self.epoch
 
@@ -236,12 +236,12 @@ class Trainer:
 
             # Create a random permutation of the indices selecting model input
             if shuffle:
-                perm = torch.randperm(data_n, device=data_device)
+                perm = torch.randperm(train_data_n, device=data_device)
             else:
-                perm = torch.tensor(range(data_n), device=data_device)
+                perm = torch.tensor(range(train_data_n), device=data_device)
 
             # Iterate over all full batches, plus one final (possibly smaller) batch
-            for i in range((data_n - 1) // bs + 1):
+            for i in range((train_data_n - 1) // bs + 1):
                 # Select batch
                 start_i = i * bs
                 end_i = (
@@ -281,7 +281,7 @@ class Trainer:
 
                 with torch.no_grad():
                     # Iterate over all full batches, plus one final (possibly smaller) batch
-                    for i in range((data_n - 1) // bs + 1):
+                    for i in range((train_data_n - 1) // bs + 1):
                         # Select batch
                         start_i = i * bs
                         end_i = (
@@ -297,7 +297,7 @@ class Trainer:
 
                         epoch_loss += loss.item() * x_data.shape[0]
 
-                epoch_loss /= data_n
+                epoch_loss /= train_data_n
 
                 self.diag_epoch_train_losses.append(epoch_loss)
 
@@ -309,13 +309,13 @@ class Trainer:
                 if x_valid is not None and y_valid is not None:
                     self.model.eval()
 
-                    valid_n = x_valid.shape[0]
+                    valid_data_n = x_valid.shape[0]
 
                     epoch_valid_loss = 0.0
 
                     with torch.no_grad():
                         # Iterate over all full batches, plus one final (possibly smaller) batch
-                        for i in range((valid_n - 1) // bs + 1):
+                        for i in range((valid_data_n - 1) // bs + 1):
                             # Select batch
                             start_i = i * bs
                             end_i = (
@@ -329,7 +329,7 @@ class Trainer:
 
                             epoch_valid_loss += loss.item() * x_data.shape[0]
 
-                    epoch_valid_loss /= valid_n
+                    epoch_valid_loss /= valid_data_n
 
                     self.diag_epoch_valid_losses.append(epoch_valid_loss)
 
