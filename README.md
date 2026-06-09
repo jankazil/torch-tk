@@ -193,6 +193,10 @@ Provides utilities for plotting diagnostics.
 
 ## Development
 
+### Code Development Commands
+
+- `make setup-dev-env` - Creates an editable conda development environment with all required dependencies.
+
 ### Code Quality and Testing Commands
 
 - `make fmt` - Runs `ruff format`, which reformats Python files according to the style rules in `pyproject.toml`.
@@ -200,6 +204,11 @@ Provides utilities for plotting diagnostics.
 - `make check` - Runs formatting and linting.
 - `make type` - Currently disabled. Intended to run `mypy` using the settings in `pyproject.toml`.
 - `make test` - Runs `pytest` with the test settings configured in `pyproject.toml`.
+
+### Code Publishing Commands
+
+- `make upload-pypi` - Uploads the package to pypi.org (credentials required)
+- `make upload-anaconda` - Uploads the package to anaconda.org (credentials required)
 
 ## Author
 
