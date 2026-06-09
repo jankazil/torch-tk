@@ -1,14 +1,19 @@
-name: torch_tk
+name: torch-tk
 channels:
   - conda-forge
 dependencies:
+  # Python runtime
   - python=3.12
   - pip
-  - pipreqs
-  - pre-commit
-  - ruff
-  - mypy
+
+  # Conda/Mamba package management
   - mamba
+
+  # Build-system requirements from pyproject.toml
+  - setuptools>=77
+  - wheel
+
+  # Runtime dependencies from pyproject.toml
   - pytorch-gpu
   - cuda-cudart-dev
   - cuda-nvcc
@@ -16,9 +21,18 @@ dependencies:
   - xarray
   - matplotlib
   - scipy
+
+  # Development tooling from [project.optional-dependencies].dev
+  - python-build
+  - twine
+  - pytest
+  - pytest-cov
+  - mypy
+  - ruff
+  - pre-commit
+
+  # Jupyter support for local development notebooks
   - jupyter_client
   - jupyter_core
   - notebook
   - ipykernel
-  - pip:
-      - git+https://github.com/jankazil/torch-tk
