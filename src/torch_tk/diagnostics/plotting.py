@@ -12,6 +12,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 from scipy.stats import gaussian_kde
 
 from .diagnostics import Diagnostics
@@ -39,6 +40,9 @@ def plot_positive_loss_kde_pdf(
 
     The loss values must be > 0 as the kernel density estimation is done in log-space of
     the loss values.
+
+    Loss values that are NaN or not finite are assumed to represent missing values, and are
+    ignored.
 
     This function accepts one Diagnostics object or a list of them. For each selected
     epoch in each diagnostic, it takes the per-sample losses for that epoch, determines the
@@ -103,8 +107,11 @@ def plot_positive_loss_kde_pdf(
         if diagnostic.per_sample_loss is None:
             raise ValueError('Each diagnostic must contain per-sample loss data.')
 
-    loss_min = min([diagnostic.per_sample_loss.min().item() for diagnostic in diagnostics])
-    loss_max = max([diagnostic.per_sample_loss.max().item() for diagnostic in diagnostics])
+    # Mask identifying finite values
+    mask_finite = torch.isfinite(diagnostic.per_sample_loss)
+
+    loss_min = min([diagnostic.per_sample_loss[mask_finite].min().item() for diagnostic in diagnostics])
+    loss_max = max([diagnostic.per_sample_loss[mask_finite].max().item() for diagnostic in diagnostics])
 
     if loss_min <= 0:
         raise ValueError('Each diagnostic must contain only positive loss values.')
@@ -131,7 +138,7 @@ def plot_positive_loss_kde_pdf(
             epoch = diagnostic.epoch[epoch_i]
 
             # Sample-resolved loss
-            model_losses = diagnostic.per_sample_loss[epoch_i].to(device='cpu')
+            model_losses = diagnostic.per_sample_loss[epoch_i][mask_finite[epoch_i]].to(device='cpu')
 
             # Construct the kernel density estimate
             kde = gaussian_kde(model_losses.log())
@@ -247,6 +254,9 @@ def plot_positive_loss_hist_pdf(
 
     The loss values must be > 0.
 
+    Loss values that are NaN or not finite are assumed to represent missing values, and are
+    ignored.
+
     This function accepts one Diagnostics object or a list of them. For each selected
     epoch in each diagnostic, it takes the per-sample losses for that epoch, constructs
     a histogram on logarithmically spaced bins, converts that histogram into a probability
@@ -310,8 +320,11 @@ def plot_positive_loss_hist_pdf(
         if diagnostic.per_sample_loss is None:
             raise ValueError('Each diagnostic must contain per-sample loss data.')
 
-    loss_min = min([diagnostic.per_sample_loss.min().item() for diagnostic in diagnostics])
-    loss_max = max([diagnostic.per_sample_loss.max().item() for diagnostic in diagnostics])
+    # Mask identifying finite values
+    mask_finite = torch.isfinite(diagnostic.per_sample_loss)
+
+    loss_min = min([diagnostic.per_sample_loss[mask_finite].min().item() for diagnostic in diagnostics])
+    loss_max = max([diagnostic.per_sample_loss[mask_finite].max().item() for diagnostic in diagnostics])
 
     if loss_min <= 0:
         raise ValueError('Each diagnostic must contain only positive loss values.')
@@ -340,7 +353,7 @@ def plot_positive_loss_hist_pdf(
             epoch = diagnostic.epoch[epoch_i]
 
             # Sample-resolved loss
-            model_losses = diagnostic.per_sample_loss[epoch_i].to(device='cpu').numpy()
+            model_losses = diagnostic.per_sample_loss[epoch_i][mask_finite[epoch_i]].to(device='cpu').numpy()
 
             # Histogram counts in logarithmic bins
             counts, _ = np.histogram(model_losses, bins=bin_edges, density=False)
@@ -457,6 +470,9 @@ def plot_positive_loss_hist_1st_moment_density(
 
     The loss values must be > 0.
 
+    Loss values that are NaN or not finite are assumed to represent missing values, and are
+    ignored.
+
     This function accepts one Diagnostics object or a list of them. For each selected
     epoch in each diagnostic, it takes the per-sample losses for that epoch, constructs
     a histogram on logarithmically spaced bins, converts that histogram into an estimate
@@ -529,8 +545,11 @@ def plot_positive_loss_hist_1st_moment_density(
         if diagnostic.per_sample_loss is None:
             raise ValueError('Each diagnostic must contain per-sample loss data.')
 
-    loss_min = min([diagnostic.per_sample_loss.min().item() for diagnostic in diagnostics])
-    loss_max = max([diagnostic.per_sample_loss.max().item() for diagnostic in diagnostics])
+    # Mask identifying finite values
+    mask_finite = torch.isfinite(diagnostic.per_sample_loss)
+
+    loss_min = min([diagnostic.per_sample_loss[mask_finite].min().item() for diagnostic in diagnostics])
+    loss_max = max([diagnostic.per_sample_loss[mask_finite].max().item() for diagnostic in diagnostics])
 
     if loss_min <= 0:
         raise ValueError('Each diagnostic must contain only positive loss values.')
@@ -559,7 +578,7 @@ def plot_positive_loss_hist_1st_moment_density(
             epoch = diagnostic.epoch[epoch_i]
 
             # Sample-resolved loss
-            model_losses = diagnostic.per_sample_loss[epoch_i].to(device='cpu').numpy()
+            model_losses = diagnostic.per_sample_loss[epoch_i][mask_finite[epoch_i]].to(device='cpu').numpy()
 
             # Histogram counts in logarithmic bins
             counts, _ = np.histogram(model_losses, bins=bin_edges, density=False)
