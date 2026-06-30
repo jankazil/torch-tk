@@ -55,6 +55,9 @@ class CheckPointManager:
         self.optimizer = optimizer
         self.directory = directory
 
+        # Suffix for checkpoint files
+        self.suffix = '.pt'
+
     def save(self, epoch, batch_size):
         '''
         Save a checkpoint for the current model and optimizer state.
@@ -78,7 +81,7 @@ class CheckPointManager:
             'optimizer_state_dict': self.optimizer.state_dict(),
         }
 
-        file_name = 'checkpoint.epoch=' + str(epoch) + '.pt'
+        file_name = 'checkpoint.epoch=' + str(epoch) + self.suffix
 
         self.directory.mkdir(parents=True, exist_ok=True)
 
@@ -86,6 +89,14 @@ class CheckPointManager:
         torch.save(checkpoint, file_path)
 
         return file_path
+
+    def list_checkpoint_files(self):
+        '''
+        Returns a list of file paths to checkpoints in the checkpoint directory
+        of this checkpoint manager.
+        '''
+
+        return sorted(self.directory.glob('*' + self.suffix))
 
     @classmethod
     def load_from_file(cls, file_path, device=None):
