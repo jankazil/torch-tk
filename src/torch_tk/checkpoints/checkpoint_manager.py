@@ -14,6 +14,7 @@ This version is not compatible with checkpoints saved by older versions of this
 module.
 '''
 
+import inspect
 from pathlib import Path
 
 import torch
@@ -308,7 +309,9 @@ class CheckPointManager:
         model_args = model_constructor_dict.get('args', [])
         model_kwargs = dict(model_constructor_dict.get('kwargs', {}))
 
-        if 'device' in model_kwargs and device is not None:
+        model_signature = inspect.signature(model_class)
+
+        if device is not None and 'device' in model_signature.parameters:
             model_kwargs['device'] = device
 
         model = model_class(*model_args, **model_kwargs)
