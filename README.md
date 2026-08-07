@@ -24,7 +24,7 @@ Both trainers support training either from a `DataLoader` or directly from tenso
 **torch-tk** provides a `Diagnostics` class for storing sample-resolved loss information together with training metadata. These diagnostics can be created from tensors or data loaders and can be saved to and restored from netCDF files for later analysis.
 
 ## Workflow
-The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook.
+The workflow is shown in the **torch-tk** [HowTo](https://github.com/jankazil/torch-tk/blob/main/notebooks/HowTo.ipynb) Jupyter notebook. The notebook requires a Jupyter kernel being available in the Python environment in which madis-data has been installed (Section "Jupyter").
 
 ## Installation
 
@@ -37,6 +37,20 @@ pip install torch-tk
 ```bash
 mamba install -c jan.kazil -c conda-forge torch-tk
 ```
+
+### Jupyter
+
+If the Conda/Mamba environment in which **torch-tk** was installed is not yet available as a Jupyter kernel, install the Jupyter dependencies and register the environment as a kernel:
+
+```bash
+mamba install -c conda-forge jupyter_client jupyter_core notebook ipykernel
+
+python -m ipykernel install --user --name "$CONDA_DEFAULT_ENV" --display-name "Python ($CONDA_DEFAULT_ENV)"
+```
+
+The kernel will then appear in Jupyter as `Python (<environment-name>)`.
+
+
 ## Public API
 
 ### Classes
