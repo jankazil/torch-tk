@@ -222,6 +222,7 @@ class CheckPointManager:
         self.model = model
         self.optimizer = optimizer
         self.directory = directory
+        self.checkpoint_files = []
 
         self.suffix = '.pt'
 
@@ -256,13 +257,9 @@ class CheckPointManager:
         file_path = self.directory / file_name
         torch.save(checkpoint, file_path)
 
-        return file_path
+        self.checkpoint_files.append(file_path)
 
-    def list_checkpoint_files(self):
-        '''
-        Return checkpoint file paths in the checkpoint directory.
-        '''
-        return sorted(self.directory.glob('*' + self.suffix))
+        return file_path
 
     @classmethod
     def load_from_file(
