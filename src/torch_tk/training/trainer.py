@@ -183,7 +183,7 @@ class Trainer:
                             end='\n',
                         )
 
-        return
+        return (epoch_wallclock_time, epoch_loss, epoch_valid_loss)
 
     def train_with_data(
         self, x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=True, verbose=True
@@ -355,7 +355,7 @@ class Trainer:
                             end='\n',
                         )
 
-        return
+        return (epoch_wallclock_time, epoch_loss, epoch_valid_loss)
 
     def plot_loss(
         self,
@@ -769,7 +769,7 @@ class MaskedTrainer:
                             end='\n',
                         )
 
-        return
+        return (epoch_wallclock_time, epoch_loss, epoch_valid_loss)
 
     def train_with_data(
         self, x_train, y_train, bs, num_epochs, epoch_diag_step=1, x_valid=None, y_valid=None, shuffle=True, verbose=True
@@ -972,7 +972,7 @@ class MaskedTrainer:
                             end='\n',
                         )
 
-        return
+        return (epoch_wallclock_time, epoch_loss, epoch_valid_loss)
 
     def plot_loss(
         self,
