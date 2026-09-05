@@ -18,7 +18,7 @@ import torch
 from ..checkpoints.checkpoint_manager import _metadata_from_checkpoint, _metadata_to_checkpoint
 from ..utilities.python import class_path_of_instance, import_class
 
-_MODEL_FORMAT_VERSION = 1
+_MODEL_FORMAT_VERSION = 2
 _ModelType = TypeVar('_ModelType', bound='Model')
 
 
