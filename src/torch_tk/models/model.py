@@ -78,8 +78,7 @@ class Model(torch.nn.Module, ABC):
 
         The file contains no optimizer or training progress. Training/evaluation
         mode is selected explicitly when loading rather than saved in the file.
-        Parent directories are created if needed. Older model files and full
-        checkpoint files are not compatible with this model file format.
+        Parent directories are created if needed.
         '''
         # Collect the model class, constructor arguments, and state dictionary.
         dictionary = {
@@ -127,8 +126,12 @@ class Model(torch.nn.Module, ABC):
             The reconstructed model with the requested training/evaluation mode.
 
         Only load trusted files: weights_only=True restricts deserialization,
-        but class reconstruction still imports and runs Python code. This method
-        rejects older model files and full checkpoint files.
+        but class reconstruction still imports and runs Python code.
+
+        This method rejects older model files.
+
+        This method accepts checkpoint files created by the torch_tk
+        CheckPointManager, restoring only the model.
         '''
         # Check the requested training/evaluation mode before loading.
         if not isinstance(training, bool):
