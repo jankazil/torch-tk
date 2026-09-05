@@ -19,7 +19,7 @@ from pathlib import Path
 
 import torch
 
-from .utils import class_path_of_instance, import_class
+from ..utilities.python import class_path_of_instance, import_class
 
 _CHECKPOINT_FORMAT_VERSION = 2
 _METADATA_TYPE_KEY = '__torch_tk_checkpoint_metadata_type__'

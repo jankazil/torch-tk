@@ -8,7 +8,7 @@ during evaluation, and identify the samples with the largest losses.
 
 import torch
 
-from torch_tk.models.utils import get_model_device
+from ..utilities.torch import get_model_device
 
 
 def per_sample_loss_from_data_loader(model, loss_function_sample_resolved, data_loader):

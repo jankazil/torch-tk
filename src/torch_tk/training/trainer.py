@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from torch_tk.models.utils import get_model_device
+from ..utilities.torch import get_model_device
 
 
 class Trainer:

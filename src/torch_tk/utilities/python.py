@@ -1,3 +1,7 @@
+'''
+Utility functions for working with python objects.
+'''
+
 import importlib
 
 
