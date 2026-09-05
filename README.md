@@ -16,8 +16,8 @@
 
 **torch-tk** provides trainer classes for epoch-based PyTorch training. It includes:
 
-* a standard `Trainer` for targets without missing values,  
-* a `MaskedTrainer` for targets that may contain missing values represented by `NaN`.  
+* a standard `Trainer` for targets without missing values,
+* a `MaskedTrainer` for targets that may contain missing values represented by `NaN`.
 
 Both trainers support training either from a `DataLoader` or directly from tensors, and record basic diagnostics such as loss and epoch wallclock time.
 
@@ -57,8 +57,8 @@ The kernel will then appear in Jupyter as `Python (<environment-name>)`.
 
 - `Model`
 
-  - A base class which makes models self-describing and automatically reconstructible by the `CheckPointManager`
-  - Automatically rebuilds a model from a saved file
+  - A base class which makes models self-describing and automatically reconstructible when saved to file
+  - Automatically rebuilds a model from a saved model file, or from a `CheckPointManager` checkpoint, restoring the model only
 
 - `SGD`, `Adam`, ...
 
@@ -105,8 +105,8 @@ The `Model` class defines and provides the following methods:
 - `Model.forward(xb)`: Abstract method that computes the forward pass.
 - `Model.constructor_dict()`: Abstract method that returns the constructor arguments needed to reconstruct the model.
 - `Model.save_state_dict_to_file(path)`: Save only the state dictionary.
-- `Model.save_to_file(path)`: Save constructor arguments and state dictionary needed to recreate the model.
-- `Model.load_from_file(path, device=None)`: Recreate a model from a saved file.
+- `Model.save_to_file(path)`: Save the model class path, constructor arguments, and state dictionary needed to recreate the model.
+- `Model.load_from_file(path, *, training, device=None, allowed_model_class_paths=None)`: Recreate a model from a saved model file or a checkpoint created by the `CheckPointManager`, restoring the model only. The concrete model class need not be specified but must remain importable. The required Boolean `training` selects training (`True`) or evaluation (`False`) mode. Older model file formats are rejected.
 - `Model.clone(constructor_dict, state_dict, device=None)`: Reconstruct a model from constructor arguments and state.
 
 #### `torch_tk.optimizers.sgd`
